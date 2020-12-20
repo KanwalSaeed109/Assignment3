@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:title="General">
+    <menu>
+        <item android:title="Home"
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_baseline_home_24"></item>
+        <item android:title="Calculator"
+            android:id="@+id/nav_calculator"
+            android:icon="@drawable/ic_baseline_calculate_24"></item>
+        <item android:title="QuizApp"
+            android:id="@+id/nav_quiz"
+            android:icon="@drawable/ic_baseline_bookmark_border_24"></item>
+
+    </menu>
+</item>
+    <item android:title="Description">
+        <menu>
+            <item android:title="About Us"
+                android:id="@+id/nav_about"></item>
+        </menu>
+    </item>
+</menu>
