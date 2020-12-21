@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,154 +20,181 @@ import java.util.Random;
 
 public class QuestionActivity extends AppCompatActivity {
 
-    Button ans1,ans2,ans3,ans4,finish;
-    TextView score,question;
-    private Questions ques=new Questions();
-    private String answers;
-    private int marks=0;
-    private int quesLength=ques.questions.length;
-    ArrayList<Integer> arr=new ArrayList<Integer>();
-    int num=0;
-    int count=0;
+    TextView countdown,quesNum,ques;
+    Button ch1,ch2,ch3,ch4,next;
+    CountDownTimer tm;
+    View v;
+    boolean isClicked = false;
+    String txt;
+    int counter,qIndex;
+    Questions q;
+    int correct=0,wrong=0;
+    ArrayList<Questions> arr=new ArrayList<Questions>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
-        ans1=findViewById(R.id.ans1);
-        ans2=findViewById(R.id.ans2);
-        ans3=findViewById(R.id.ans3);
-        ans4=findViewById(R.id.ans4);
-        score=findViewById(R.id.score);
-        question=findViewById(R.id.question);
-        finish=findViewById(R.id.finish);
+        countdown=findViewById(R.id.timer);
+        quesNum=findViewById(R.id.qNum);
+        ques=findViewById(R.id.question);
+        ch1=findViewById(R.id.ans1);
+        ch2=findViewById(R.id.ans2);
+        ch3=findViewById(R.id.ans3);
+        ch4=findViewById(R.id.ans4);
+        next=findViewById(R.id.next);
 
-        arr.add(new Integer(1));
-        arr.add(new Integer(2));
-        arr.add(new Integer(3));
-        arr.add(new Integer(4));
-        arr.add(new Integer(5));
-        arr.add(new Integer(6));
-        arr.add(new Integer(7));
-        arr.add(new Integer(8));
-        arr.add(new Integer(9));
-        arr.add(new Integer(10));
+        arr.add(new Questions("1) Who is the Patron Saint of Spain?","a) St James","b) St John","c) St Benedict","d) None","b) St John"));
+        arr.add(new Questions("2) Which of these means a speech in a play where a character talks to themselves rather than to other characters?","a) Interlude","b) Revue","c) Soliloquy","d) None","c) Soliloquy"));
+        arr.add(new Questions("3) In the Vicar of Dibley, what was the name of the vicar's clueless friend?","a) Alice","b) Beatrice","c) Charlotte","d) None","a) Alice"));
+        arr.add(new Questions("4) Casterly Rock is the ancestral home of which family in Game of Thrones?","a) The Starks","b) The Tully's","c) The Lannisters","d) None","b) The Tully's"));
+        arr.add(new Questions( "5) Which breed of dog used to be sacred in China?","a) Cockapoo","b) Pekingese","c) Spaniel","d) All","d) All"));
+        arr.add(new Questions("6) Which philosopher coined the term 'I think, therefore I am'?","a) Plato","b) Descartes","c) Socrates","d) None of them","b) Descartes"));
+        arr.add(new Questions("7) Who was mayor of London before Boris Johnson?","a) Sadiq Khan","b) John Major","c) Ken Livingston","d) None of them","d) None of them"));
+        arr.add(new Questions("8) Which two countries are Europes biggest exporters of beers?","a) Germany and Belgium","b) Germany and Spain","c) Belgium and Spain","d) Europe and Spain","a) Germany and Belgium"));
+        arr.add(new Questions("9) Which two calendar months are named after Roman Emperors?","a) July and June","b) December and May","c) July and August","d) January and March","b) December and May"));
+        arr.add(new Questions("10) How many novels did the Bronte sisters write in total?","a) Nine","b) Seven","c) Eight","d) Six", "b) Seven"));
         Collections.shuffle(arr);
+        counter=0;
+        countdown.setText("" +10);
+        setData(counter);
 
-
-        finish.setOnClickListener(new View.OnClickListener() {
+        next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gameOver();
-            }
-        });
-        score.setText("Score: "+ marks);
+                if(isClicked==true)
+                {
+                    Log.i("bool", "onClick: "+isClicked);
+                    ClickNext(view,txt,qIndex);
+                }
+                else
+                {
+                    Log.i("bool", "else: "+isClicked);
+                    ClickNext(v,"Nothing",0);
+                }
 
-        updateQues();
-
-        ans1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ans1.getText()==answers){
-                    marks++;
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-                else if(ans1.getText()!=answers){
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-            }
-        });
-        ans2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ans2.getText()==answers){
-                    marks++;
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-                else if(ans2.getText()!=answers){
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
 
             }
         });
-        ans3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ans3.getText()==answers){
-                    marks++;
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-                else if(ans3.getText()!=answers){
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
 
-            }
-        });
-        ans4.setOnClickListener(new View.OnClickListener() {
+        tm= new CountDownTimer(10*1000,1000)
+        {
             @Override
-            public void onClick(View view) {
-                if(ans4.getText()==answers){
-                    marks++;
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-                else if(ans4.getText()!=answers){
-                    score.setText("Score: "+ marks);
-                    updateQues();
-                }
-
+            public void onTick(long l) {
+                countdown.setText(String.format("%d", l / 1000));
             }
-        });
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(QuestionActivity.this, "Time Over", Toast.LENGTH_SHORT).show();
+
+                ClickNext(v,"Nothing",0);
+            }
+        };
     }
-
-    private void gameOver() {
-        AlertDialog.Builder alertDialogBuilder=new AlertDialog.Builder(QuestionActivity.this);
-        alertDialogBuilder.setMessage("Your score is "+ marks + " points.")
-        .setCancelable(false)
-        .setPositiveButton("New Game",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(getApplicationContext(),QuestionActivity.class));
-                        finish();
-                    }
-                })
-                .setNegativeButton("Exit",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                finish();
-                            }
-                        });
-        AlertDialog alertDialog=alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    private void updateQues() {
-        if (count < 10){
-            int i = arr.get(num);
-            question.setText(ques.getQuestion(i));
-            ans1.setText(ques.getChoice1(i));
-            ans2.setText(ques.getChoice2(i));
-            ans3.setText(ques.getChoice3(i));
-            ans4.setText(ques.getChoice4(i));
-
-            answers = ques.getAns(i);
-            count++;
-            num++;
+    public  void setData(final int val)
+    {
+        final Questions obj=arr.get(val);
+        quesNum.setText((val+1)+"/"+arr.size());
+        if (tm!=null)
+        {
+            tm.start();
         }
-        else{
-            gameOver();
-        }
+        ques.setText("#"+(val+1)+" "+obj.getQuestion());
+        ch1.setText(obj.getOpt1());
+        ch2.setText(obj.getOpt2());
+        ch3.setText(obj.getOpt3());
+        ch4.setText(obj.getOpt4());
+        ch1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isClicked=true;
+                txt = ch1.getText().toString();
+                qIndex = val;
+
+            }
+        });
+
+        ch2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isClicked=true;
+                txt=ch2.getText().toString();
+                qIndex=val;
+
+            }
+        });
+
+        ch3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isClicked=true;
+                txt=ch3.getText().toString();
+                qIndex=val;
+            }
+        });
+
+        ch4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isClicked=true;
+                txt=ch4.getText().toString();
+                qIndex=val;
+            }
+        });
 
     }
+    ////////New Intent/////
+    public void newActivity(View view,int val,int total,int wrong)
+    {
+        Intent intent = new Intent(this,Score.class);
+        String result="Your Result is\n  "+"Correct: "+val+"/"+total+"\n"+"Wrong: "+wrong+"/"+total;
+        intent.putExtra("Result",result);
+        startActivity(intent);
 
+    }
+    //////Next Click Activity//////
+    public void ClickNext(View view,String clickedButtonText,int questionIndex)
+    {
+        final Questions q=arr.get(questionIndex);
+
+        if(counter<(arr.size()-1))
+        {
+            if(txt.equals(q.getAnswer())) {
+                correct++;
+            }
+            else {
+                wrong++;
+            }
+
+            tm.cancel();
+            isClicked=false;
+            counter++;
+            setData(counter);
+            if(counter==(arr.size()-1)){
+                next.setText("Finish");
+            }
+        }
+
+        else
+        {
+
+            if(txt.equals(q.getAnswer()))
+            {
+                correct++;
+            }
+            else {
+                wrong++;
+            }
+            tm.cancel();
+
+            Toast.makeText(QuestionActivity.this, "Questions are completed", Toast.LENGTH_SHORT).show();
+            newActivity(view,correct,arr.size(),wrong);
+        }
+    }
 
 }
+
+
+
